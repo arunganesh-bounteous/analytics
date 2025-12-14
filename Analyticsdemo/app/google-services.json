@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "71268409330",
+    "project_id": "test-analytics-bd2ee",
+    "storage_bucket": "test-analytics-bd2ee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71268409330:android:2c01b3ed86cfc51f82156b",
+        "android_client_info": {
+          "package_name": "com.bounteous.analytics"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAllBMQNORbYI4s8ddDT-6p2nuRppWyqMM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
