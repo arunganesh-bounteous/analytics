@@ -1,0 +1,81 @@
+name: Android Release Build → Firebase Distribution
+
+on:
+  push:
+    branches: ["main","release/**"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # -------------------------
+      # Checkout source
+      # -------------------------
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # -------------------------
+      # Set up JDK
+      # -------------------------
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      # -------------------------
+      # Restore Gradle cache
+      # -------------------------
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      # -------------------------
+      # Rebuild keystore file from secret
+      # -------------------------
+      - name: Restore Keystore from Base64
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > app/analytics.jks
+
+      # -------------------------
+      # Create keystore.properties for signing
+      # -------------------------
+      - name: Create keystore.properties
+        run: |
+          echo "storeFile=analytics.jks" >> keystore.properties
+          echo "storePassword=$KEYSTORE_PASSWORD" >> keystore.properties
+          echo "keyAlias=$KEY_ALIAS" >> keystore.properties
+          echo "keyPassword=$KEY_PASSWORD" >> keystore.properties
+
+      # -------------------------
+      # Make Gradle wrapper executable
+      # -------------------------
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      # -------------------------
+      # Build signed Release APK
+      # -------------------------
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      # -------------------------
+      # Upload to Firebase App Distribution
+      # Official v2 Action (service account auth)
+      # -------------------------
+      - name: Upload to Firebase App Distribution
+        uses: firebase/firebase-app-distribution-github-action@v2
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          groups: testers
+          releaseNotes: "Automated CI/CD Release Build"
+          file: app/build/outputs/apk/release/app-release.apk
