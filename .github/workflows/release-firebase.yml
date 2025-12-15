@@ -38,6 +38,14 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
+      - name: Debug secret length
+        run: |
+          echo -n "$ANDROID_KEYSTORE_BASE64" | wc -c
+
+      - name: Debug decoded file
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > analytics.jks
+          ls -l analytics.jks
       # -------------------------
       # Rebuild keystore file from secret
       # -------------------------
