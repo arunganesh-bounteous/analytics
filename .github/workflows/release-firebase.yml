@@ -42,10 +42,11 @@ jobs:
         run: |
           echo -n "$ANDROID_KEYSTORE_BASE64" | wc -c
 
-      - name: Debug decoded file
+      - name: Debug decoded keystore
         run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > analytics.jks
-          ls -l analytics.jks
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > analytics.jks || true
+          ls -l analytics.jks || true
+          file analytics.jks || true
       # -------------------------
       # Rebuild keystore file from secret
       # -------------------------
