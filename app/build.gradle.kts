@@ -34,7 +34,7 @@ android {
     signingConfigs {
         create("release") {
             if (keystoreFile.exists()) {
-                storeFile = file("analytics.jks")
+                storeFile = rootProject.file("analytics.jks")
                 storePassword = keystoreProperties["storePassword"] as String
                 keyAlias = keystoreProperties["keyAlias"] as String
                 keyPassword = keystoreProperties["keyPassword"] as String
