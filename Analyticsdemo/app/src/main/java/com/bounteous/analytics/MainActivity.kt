@@ -50,6 +50,5 @@ class MainActivity : AppCompatActivity() {
         }
 
         firebaseAnalytics.logEvent("button_clicked", params)
-        //CI/CD trigger test
     }
 }
