@@ -67,6 +67,14 @@ jobs:
       - name: Build Release APK
         run: ./gradlew assembleRelease
 
+      - name: Debug APK paths
+        run: |
+          echo "---- Listing app/build/outputs ----"
+          ls -R app/build/outputs || true
+
+          echo "---- Listing app/build/intermediates ----"
+          ls -R app/build/intermediates || true
+
       # -------------------------
       # Upload to Firebase App Distribution
       # Official v2 Action (service account auth)
