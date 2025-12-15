@@ -43,7 +43,7 @@ jobs:
       # -------------------------
       - name: Restore Keystore from Base64
         run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > app/analytics.jks
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > analytics.jks
 
       # -------------------------
       # Create keystore.properties for signing
