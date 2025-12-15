@@ -72,7 +72,7 @@ jobs:
       # Official v2 Action (service account auth)
       # -------------------------
       - name: Upload to Firebase App Distribution
-        uses: firebase/firebase-app-distribution-github-action@v2
+        uses: firebase/app-distribution-action@v2
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
