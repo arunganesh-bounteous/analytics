@@ -1,4 +1,4 @@
-name: Android Release Build → Firebase Distribution
+name: Android Release Build to Firebase Distribution
 
 on:
   push:
