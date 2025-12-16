@@ -2,7 +2,7 @@ name: Android Release Build to Firebase Distribution
 
 on:
   push:
-    branches: ["main","release/**"]
+    branches: ["main", "release/**"]
   workflow_dispatch:
 
 jobs:
@@ -17,13 +17,13 @@ jobs:
         uses: actions/checkout@v3
 
       # -------------------------
-      # Set up JDK
+      # Set up JDK (Downgraded to 11 for keystore compatibility)
       # -------------------------
-      - name: Set up JDK 17
+      - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 11 # Using JDK 11 to improve keystore compatibility
 
       # -------------------------
       # Restore Gradle cache
@@ -38,31 +38,32 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
-      - name: Debug secret length
-        run: |
-          echo -n "$ANDROID_KEYSTORE_BASE64" | wc -c
-
-      - name: Debug decoded keystore
-        run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > analytics.jks || true
-          ls -l analytics.jks || true
-          file analytics.jks || true
       # -------------------------
-      # Rebuild keystore file from secret
+      # Decode Keystore and Save as .p12 (Corrected Secret Access)
       # -------------------------
-      - name: Restore Keystore from Base64
+      - name: Decode Keystore and Save as .p12
         run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > analytics.jks
+          # The variable $DECODED_KEYSTORE is correctly accessed in the run block
+          echo "$DECODED_KEYSTORE" | base64 --decode > analytics.p12
+        env:
+          # Secret is mapped to an environment variable in the current step
+          DECODED_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
       # -------------------------
-      # Create keystore.properties for signing
+      # Create keystore.properties for signing (Corrected Secret Access)
       # -------------------------
       - name: Create keystore.properties
         run: |
-          echo "storeFile=analytics.jks" >> keystore.properties
+          # Environment variables are correctly accessed in the run block
+          echo "storeFile=analytics.p12" >> keystore.properties 
           echo "storePassword=$KEYSTORE_PASSWORD" >> keystore.properties
           echo "keyAlias=$KEY_ALIAS" >> keystore.properties
           echo "keyPassword=$KEY_PASSWORD" >> keystore.properties
+        env:
+          # Secrets are mapped to environment variables in the current step
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
       # -------------------------
       # Make Gradle wrapper executable
@@ -86,7 +87,6 @@ jobs:
 
       # -------------------------
       # Upload to Firebase App Distribution
-      # Official v2 Action (service account auth)
       # -------------------------
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
