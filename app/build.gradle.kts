@@ -31,13 +31,19 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // In your app/build.gradle.kts file
+
     signingConfigs {
         create("release") {
             if (keystoreFile.exists()) {
-                storeFile = rootProject.file("analytics.jks")
+                // CRITICAL CHANGE: Update the file extension to match the CI file name (.p12)
+                storeFile = rootProject.file("analytics.p12")
+
                 storePassword = keystoreProperties["storePassword"] as String
                 keyAlias = keystoreProperties["keyAlias"] as String
                 keyPassword = keystoreProperties["keyPassword"] as String
+
+                // Keep the storeType fix for redundancy and clarity
                 storeType = "PKCS12"
             }
         }
